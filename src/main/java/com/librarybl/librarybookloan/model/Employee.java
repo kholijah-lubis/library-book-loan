@@ -1,14 +1,12 @@
 package com.librarybl.librarybookloan.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.UUID;
 
-@Setter
-@Getter
+@Data
 @Entity
 @Table(name = "employee")
 public class Employee {
@@ -20,4 +18,3 @@ public class Employee {
     private String name;
     private String position;
 }
-

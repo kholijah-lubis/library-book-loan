@@ -1,8 +1,6 @@
 package com.librarybl.librarybookloan.model;
 
-
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -10,8 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Setter
-@Getter
+@Data
 @Entity
 @Table(name = "member")
 public class Member {
@@ -24,5 +21,6 @@ public class Member {
     private String phoneNumber;
     private String address;
 
+    @OneToMany(mappedBy = "borrowed")
     private List<Borrowing> borrowings = new ArrayList<>();
 }

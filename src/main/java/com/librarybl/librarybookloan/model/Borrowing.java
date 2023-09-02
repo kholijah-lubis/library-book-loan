@@ -1,15 +1,13 @@
 package com.librarybl.librarybookloan.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Setter
-@Getter
+@Data
 @Entity
 @Table(name = "borrowing")
 public class Borrowing {
@@ -25,12 +23,10 @@ public class Borrowing {
     private LocalDate returnDate;
 
     @ManyToOne
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "bookId", insertable = false, updatable = false)
     private Book book;
 
     @ManyToOne
-    @JoinColumn(name = "borrowed_id")
+    @JoinColumn(name = "borrowedId", insertable = false, updatable = false)
     private Member borrowed;
-
 }
-

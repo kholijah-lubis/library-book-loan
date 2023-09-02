@@ -1,16 +1,14 @@
 package com.librarybl.librarybookloan.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 @Entity
 @Table(name = "book")
 public class Book {
@@ -23,7 +21,11 @@ public class Book {
     private String author;
     private int stockAvailable;
 
-    @OneToMany(mappedBy = "book")
-    private List<Borrowing> borrowings = new ArrayList<>();
+    // Konstruktor dengan argumen
+    public Book(String title, String author, int stockAvailable) {
+        this.title = title;
+        this.author = author;
+        this.stockAvailable = stockAvailable;
+    }
 
 }
