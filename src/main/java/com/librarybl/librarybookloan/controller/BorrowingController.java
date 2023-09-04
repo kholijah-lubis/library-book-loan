@@ -1,12 +1,13 @@
 package com.librarybl.librarybookloan.controller;
 
-import com.librarybl.librarybookloan.model.Borrowing;
+import com.librarybl.librarybookloan.dto.BorrowingDTO;
 import com.librarybl.librarybookloan.service.BorrowingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,32 +19,36 @@ public class BorrowingController {
     private BorrowingService borrowingService;
 
     @GetMapping
-    public ResponseEntity<List<Borrowing>> getAllBorrowings() {
-        List<Borrowing> borrowings = borrowingService.getAllBorrowings();
-        return new ResponseEntity<>(borrowings, HttpStatus.OK);
+    public List<BorrowingDTO> getAllBorrowings() {
+        List<BorrowingDTO> borrowingDTOs = borrowingService.getAllBorrowings();
+        return borrowingDTOs;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Borrowing> getBorrowingById(@PathVariable UUID id) {
-        Borrowing borrowing = borrowingService.getBorrowingById(id);
-        if (borrowing != null) {
-            return new ResponseEntity<>(borrowing, HttpStatus.OK);
+    public ResponseEntity<BorrowingDTO> getBorrowingById(@PathVariable UUID id) {
+        BorrowingDTO borrowingDTO = borrowingService.getBorrowingDTOById(id);
+        if (borrowingDTO != null) {
+            return new ResponseEntity<>(borrowingDTO, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping
-    public ResponseEntity<Borrowing> createBorrowing(@RequestBody Borrowing borrowing) {
-        Borrowing createdBorrowing = borrowingService.createBorrowing(borrowing);
-        return new ResponseEntity<>(createdBorrowing, HttpStatus.CREATED);
+    public ResponseEntity<BorrowingDTO> createBorrowing(@RequestBody BorrowingDTO borrowingDTO) {
+        BorrowingDTO createdBorrowingDTO = borrowingService.createBorrowingDTO(borrowingDTO);
+        if (createdBorrowingDTO != null) {
+            return new ResponseEntity<>(createdBorrowingDTO, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Borrowing> updateBorrowing(@PathVariable UUID id, @RequestBody Borrowing updatedBorrowing) {
-        Borrowing borrowing = borrowingService.updateBorrowing(id, updatedBorrowing);
-        if (borrowing != null) {
-            return new ResponseEntity<>(borrowing, HttpStatus.OK);
+    public ResponseEntity<BorrowingDTO> updateBorrowing(@PathVariable UUID id, @RequestBody BorrowingDTO updatedBorrowingDTO) {
+        BorrowingDTO updatedBorrowing = borrowingService.updateBorrowingDTO(id, updatedBorrowingDTO);
+        if (updatedBorrowing != null) {
+            return new ResponseEntity<>(updatedBorrowing, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

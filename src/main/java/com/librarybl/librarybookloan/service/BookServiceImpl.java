@@ -1,7 +1,7 @@
 package com.librarybl.librarybookloan.service;
 
 import com.librarybl.librarybookloan.model.Book;
-import com.librarybl.librarybookloan.repository.BookRepository;
+import com.librarybl.librarybookloan.repository.BookRepositoryb;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import java.util.UUID;
 public class BookServiceImpl implements BookService {
 
     @Autowired
-    private BookRepository bookRepository;
+    private BookRepositoryb bookRepository;
 
     @Override
     public List<Book> getAllBooks() {
