@@ -1,53 +1,50 @@
 package com.librarybl.librarybookloan.service;
 
 import com.librarybl.librarybookloan.model.Employee;
+import com.librarybl.librarybookloan.repository.EmployeeRepository;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private final List<Employee> employees = new ArrayList<>();
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     @Override
     public List<Employee> getAllEmployees() {
-        return employees;
+        return employeeRepository.findAll();
     }
 
     @Override
     public Employee getEmployeeById(UUID id) {
-        return employees.stream()
-                .filter(employee -> employee.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        return employeeRepository.findById(id).orElse(null);
     }
 
     @Override
     public Employee createEmployee(Employee employee) {
-        employee.setId(UUID.randomUUID());
-        employees.add(employee);
-        return employee;
+        return employeeRepository.save(employee);
     }
 
     @Override
     public Employee updateEmployee(UUID id, Employee updatedEmployee) {
-        Employee existingEmployee = getEmployeeById(id);
+        Employee existingEmployee = employeeRepository.findById(id).orElse(null);
         if (existingEmployee != null) {
-            existingEmployee.setName(updatedEmployee.getName());
-            existingEmployee.setPosition(updatedEmployee.getPosition());
-            return existingEmployee;
+            BeanUtils.copyProperties(updatedEmployee, existingEmployee, "id");
+            return employeeRepository.save(existingEmployee);
         }
         return null;
     }
 
     @Override
     public void deleteEmployee(UUID id) {
-        Employee existingEmployee = getEmployeeById(id);
-        if (existingEmployee != null) {
-            employees.remove(existingEmployee);
+        Employee employeeToDelete = employeeRepository.findById(id).orElse(null);
+        if (employeeToDelete != null) {
+            employeeRepository.delete(employeeToDelete);
         }
     }
 }

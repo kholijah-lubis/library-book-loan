@@ -1,5 +1,6 @@
 package com.librarybl.librarybookloan.controller;
 
+import com.librarybl.librarybookloan.dto.MemberDTO;
 import com.librarybl.librarybookloan.model.Member;
 import com.librarybl.librarybookloan.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,16 +35,28 @@ public class MemberController {
     }
 
     @PostMapping
-    public ResponseEntity<Member> createMember(@RequestBody Member member) {
+    public ResponseEntity<Member> createMember(@RequestBody MemberDTO memberDTO) {
+
+        Member member = new Member();
+        member.setName(memberDTO.getName());
+        member.setPhoneNumber(memberDTO.getPhoneNumber());
+        member.setAddress(memberDTO.getAddress());
+
         Member createdMember = memberService.createMember(member);
         return new ResponseEntity<>(createdMember, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Member> updateMember(@PathVariable UUID id, @RequestBody Member updatedMember) {
-        Member member = memberService.updateMember(id, updatedMember);
-        if (member != null) {
-            return new ResponseEntity<>(member, HttpStatus.OK);
+    public ResponseEntity<Member> updateMember(@PathVariable UUID id, @RequestBody MemberDTO updatedMemberDTO) {
+        Member existingMember = memberService.getMemberById(id);
+        if (existingMember != null) {
+
+            existingMember.setName(updatedMemberDTO.getName());
+            existingMember.setPhoneNumber(updatedMemberDTO.getPhoneNumber());
+            existingMember.setAddress(updatedMemberDTO.getAddress());
+
+            Member updatedMember = memberService.updateMember(id, existingMember);
+            return new ResponseEntity<>(updatedMember, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

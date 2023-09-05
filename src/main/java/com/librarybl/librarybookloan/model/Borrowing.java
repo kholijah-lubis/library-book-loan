@@ -1,7 +1,5 @@
 package com.librarybl.librarybookloan.model;
 
-import com.librarybl.librarybookloan.model.Book;
-import com.librarybl.librarybookloan.model.Member;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -25,7 +23,7 @@ public class Borrowing {
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    private Member borrowed;
+    private Member borrowedMember;
 
     private LocalDate borrowDate;
     private LocalDate returnDate;
@@ -36,7 +34,6 @@ public class Borrowing {
         this.id = UUID.randomUUID();
     }
 
-    // Metode untuk mengatur tanggal pengembalian otomatis dan perhitungan denda
     public void setReturnDateAutomatically() {
         this.returnDate = LocalDate.now().plusWeeks(1);
     }
@@ -44,9 +41,9 @@ public class Borrowing {
     public void calculateFine() {
         if (returned && returnDate.isBefore(LocalDate.now())) {
             long daysLate = ChronoUnit.DAYS.between(returnDate, LocalDate.now());
-            fineAmount = (int) (daysLate * 1000); // Denda 1000 per hari terlambat.
+            fineAmount = (int) (daysLate * 1000);
         } else {
-            fineAmount = 0; // Tidak ada denda jika tepat waktu.
+            fineAmount = 0;
         }
     }
 }

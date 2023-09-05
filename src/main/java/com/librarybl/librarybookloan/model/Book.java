@@ -21,7 +21,6 @@ public class Book {
     private String author;
     private int stockAvailable;
 
-    // Konstruktor dengan argumen
     public Book(String title, String author, int stockAvailable) {
         this.title = title;
         this.author = author;

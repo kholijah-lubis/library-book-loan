@@ -1,54 +1,47 @@
 package com.librarybl.librarybookloan.service;
 
 import com.librarybl.librarybookloan.model.Member;
+import com.librarybl.librarybookloan.repository.MemberRepository;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class MemberServiceImpl implements MemberService {
 
-    private final List<Member> members = new ArrayList<>();
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Override
     public List<Member> getAllMembers() {
-        return members;
+        return memberRepository.findAll();
     }
 
     @Override
     public Member getMemberById(UUID id) {
-        return members.stream()
-                .filter(member -> member.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        return memberRepository.findById(id).orElse(null);
     }
 
     @Override
     public Member createMember(Member member) {
-        member.setId(UUID.randomUUID());
-        members.add(member);
-        return member;
+        return memberRepository.save(member);
     }
 
     @Override
     public Member updateMember(UUID id, Member updatedMember) {
-        Member existingMember = getMemberById(id);
+        Member existingMember = memberRepository.findById(id).orElse(null);
         if (existingMember != null) {
-            existingMember.setName(updatedMember.getName());
-            existingMember.setPhoneNumber(updatedMember.getPhoneNumber());
-            existingMember.setAddress(updatedMember.getAddress());
-            return existingMember;
+            BeanUtils.copyProperties(updatedMember, existingMember, "id");
+            return memberRepository.save(existingMember);
         }
         return null;
     }
 
     @Override
     public void deleteMember(UUID id) {
-        Member existingMember = getMemberById(id);
-        if (existingMember != null) {
-            members.remove(existingMember);
-        }
+        memberRepository.deleteById(id);
     }
 }

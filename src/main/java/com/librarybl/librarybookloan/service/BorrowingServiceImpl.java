@@ -1,7 +1,9 @@
 package com.librarybl.librarybookloan.service;
 
 import com.librarybl.librarybookloan.dto.BorrowingDTO;
+import com.librarybl.librarybookloan.model.Book;
 import com.librarybl.librarybookloan.model.Borrowing;
+import com.librarybl.librarybookloan.model.Member;
 import com.librarybl.librarybookloan.repository.BorrowingRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,11 @@ public class BorrowingServiceImpl implements BorrowingService {
     @Autowired
     private BorrowingRepository borrowingRepository;
 
+    @Autowired
+    private BookService bookService; // Inject BookService
+    @Autowired
+    private MemberService memberService; // Inject MemberService
+
     @Override
     public List<BorrowingDTO> getAllBorrowings() {
         List<Borrowing> borrowings = borrowingRepository.findAll();
@@ -25,6 +32,8 @@ public class BorrowingServiceImpl implements BorrowingService {
         for (Borrowing borrowing : borrowings) {
             BorrowingDTO borrowingDTO = new BorrowingDTO();
             BeanUtils.copyProperties(borrowing, borrowingDTO);
+            borrowingDTO.setBookId(borrowing.getBook().getId()); // Set Book ID
+            borrowingDTO.setMemberId(borrowing.getBorrowedMember().getId()); // Set Member ID
             borrowingDTOs.add(borrowingDTO);
         }
 
@@ -37,6 +46,8 @@ public class BorrowingServiceImpl implements BorrowingService {
         if (borrowing != null) {
             BorrowingDTO borrowingDTO = new BorrowingDTO();
             BeanUtils.copyProperties(borrowing, borrowingDTO);
+            borrowingDTO.setBookId(borrowing.getBook().getId()); // Set Book ID
+            borrowingDTO.setMemberId(borrowing.getBorrowedMember().getId()); // Set Member ID
             return borrowingDTO;
         } else {
             return null;
@@ -45,31 +56,45 @@ public class BorrowingServiceImpl implements BorrowingService {
 
     @Override
     public BorrowingDTO createBorrowingDTO(BorrowingDTO borrowingDTO) {
-        Borrowing borrowing = new Borrowing();
-        BeanUtils.copyProperties(borrowingDTO, borrowing);
-        Borrowing createdBorrowing = borrowingRepository.save(borrowing);
 
-        if (createdBorrowing != null) {
-            BorrowingDTO createdBorrowingDTO = new BorrowingDTO();
-            BeanUtils.copyProperties(createdBorrowing, createdBorrowingDTO);
-            return createdBorrowingDTO;
-        } else {
-            return null;
+        Book book = bookService.getBookById(borrowingDTO.getBookId());
+        Member member = memberService.getMemberById(borrowingDTO.getMemberId());
+
+        if (book != null && member != null) {
+            Borrowing borrowing = new Borrowing();
+            BeanUtils.copyProperties(borrowingDTO, borrowing);
+            borrowing.setBook(book);
+            borrowing.setBorrowedMember(member);
+            borrowing.setBorrowDate(borrowingDTO.getBorrowDate());
+
+            Borrowing createdBorrowing = borrowingRepository.save(borrowing);
+
+            if (createdBorrowing != null) {
+                BorrowingDTO createdBorrowingDTO = new BorrowingDTO();
+                BeanUtils.copyProperties(createdBorrowing, createdBorrowingDTO);
+                createdBorrowingDTO.setBookId(createdBorrowing.getBook().getId()); // Set Book ID
+                createdBorrowingDTO.setMemberId(createdBorrowing.getBorrowedMember().getId()); // Set Member ID
+                return createdBorrowingDTO;
+            }
         }
+        return null;
     }
 
     @Override
     public BorrowingDTO updateBorrowingDTO(UUID id, BorrowingDTO updatedBorrowingDTO) {
         Borrowing existingBorrowing = borrowingRepository.findById(id).orElse(null);
         if (existingBorrowing != null) {
-            // Implementasi pembaruan peminjaman di sini
-            // Anda dapat mengganti properti yang sesuai
+
             BeanUtils.copyProperties(updatedBorrowingDTO, existingBorrowing);
             existingBorrowing.setId(id); // Pastikan ID tidak berubah
+            existingBorrowing.setBook(bookService.getBookById(updatedBorrowingDTO.getBookId())); // Set Book
+            existingBorrowing.setBorrowedMember(memberService.getMemberById(updatedBorrowingDTO.getMemberId())); // Set Member
             Borrowing updatedBorrowing = borrowingRepository.save(existingBorrowing);
 
             updatedBorrowingDTO = new BorrowingDTO();
             BeanUtils.copyProperties(updatedBorrowing, updatedBorrowingDTO);
+            updatedBorrowingDTO.setBookId(updatedBorrowing.getBook().getId()); // Set Book ID
+            updatedBorrowingDTO.setMemberId(updatedBorrowing.getBorrowedMember().getId()); // Set Member ID
             return updatedBorrowingDTO;
         }
         return null;
